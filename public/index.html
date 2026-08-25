@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Image to Video Generator</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <h1>🎬 Image to Video Generator</h1>
+      <p class="subtitle">Transform your images into stunning videos with AI</p>
+    </header>
+
+    <main class="main-content">
+      <!-- Instructions Section -->
+      <section class="instructions-section">
+        <h2>📖 How to Use</h2>
+        <div class="instructions-grid">
+          <div class="instruction-card">
+            <div class="step-number">1</div>
+            <h3>Upload Image</h3>
+            <p>Click "Choose Image" and select a JPEG, PNG, GIF, or WebP file (max 50MB)</p>
+          </div>
+          <div class="instruction-card">
+            <div class="step-number">2</div>
+            <h3>Enter Prompt</h3>
+            <p>Describe what you want to happen in the video (e.g., "camera panning across mountains")</p>
+          </div>
+          <div class="instruction-card">
+            <div class="step-number">3</div>
+            <h3>Set Duration</h3>
+            <p>Choose video length between 1-60 seconds</p>
+          </div>
+          <div class="instruction-card">
+            <div class="step-number">4</div>
+            <h3>Generate & Download</h3>
+            <p>Click "Generate Video" and wait for processing to complete</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Generator Section -->
+      <section class="generator-section">
+        <div class="generator-card">
+          <form id="generatorForm" class="form">
+            <!-- Image Upload -->
+            <div class="form-group">
+              <label for="imageInput" class="form-label">Step 1: Upload Your Image</label>
+              <div class="file-input-wrapper">
+                <input
+                  type="file"
+                  id="imageInput"
+                  accept=".jpg,.jpeg,.png,.gif,.webp"
+                  required
+                  class="file-input"
+                />
+                <label for="imageInput" class="file-label">
+                  <span class="upload-icon">📸</span>
+                  <span class="upload-text">Choose Image or Drag & Drop</span>
+                </label>
+              </div>
+              <p class="file-info">Supported formats: JPEG, PNG, GIF, WebP | Max size: 50MB</p>
+              <div id="previewContainer" class="preview-container" style="display: none;">
+                <img id="imagePreview" alt="Preview" class="image-preview" />
+                <div class="preview-info">
+                  <p id="fileName"></p>
+                  <button type="button" class="btn-change" onclick="document.getElementById('imageInput').click()">Change Image</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Prompt Input -->
+            <div class="form-group">
+              <label for="promptInput" class="form-label">Step 2: Enter Your Prompt</label>
+              <textarea
+                id="promptInput"
+                placeholder="Example: Camera slowly pans across a beautiful landscape with clouds moving across the sky"
+                required
+                rows="4"
+                class="textarea"
+              ></textarea>
+              <p class="form-help">Describe the motion, effects, or changes you want in your video</p>
+              <div class="char-count">
+                <span id="charCount">0</span> / 500 characters
+              </div>
+            </div>
+
+            <!-- Duration Input -->
+            <div class="form-group">
+              <label for="durationInput" class="form-label">Step 3: Set Video Duration</label>
+              <div class="duration-input-group">
+                <input
+                  type="range"
+                  id="durationSlider"
+                  min="1"
+                  max="60"
+                  value="5"
+                  class="duration-slider"
+                />
+                <div class="duration-display">
+                  <input
+                    type="number"
+                    id="durationInput"
+                    min="1"
+                    max="60"
+                    value="5"
+                    class="duration-number"
+                  />
+                  <span class="duration-unit">seconds</span>
+                </div>
+              </div>
+              <p class="form-help">Duration: 1-60 seconds</p>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="form-group button-group">
+              <button type="submit" class="btn btn-primary" id="generateBtn">
+                <span class="btn-icon">🎬</span>
+                <span class="btn-text">Generate Video</span>
+              </button>
+              <button type="reset" class="btn btn-secondary">Clear</button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- Progress Section -->
+      <div id="progressSection" class="progress-section" style="display: none;">
+        <div class="progress-card">
+          <h3>Processing Your Video...</h3>
+          <div class="progress-bar-container">
+            <div id="progressBar" class="progress-bar"></div>
+          </div>
+          <div class="progress-info">
+            <span id="progressText">0%</span>
+            <span id="statusText">Starting...</span>
+          </div>
+          <div class="progress-steps">
+            <div id="step1" class="progress-step">📸 Loading image...</div>
+            <div id="step2" class="progress-step">💭 Processing prompt...</div>
+            <div id="step3" class="progress-step">🎞️ Generating frames...</div>
+            <div id="step4" class="progress-step">🎬 Encoding video...</div>
+            <div id="step5" class="progress-step">✨ Finalizing...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Results Section -->
+      <div id="resultsSection" class="results-section" style="display: none;">
+        <div class="results-card">
+          <div id="successResult" style="display: none;">
+            <h3>✅ Video Generated Successfully!</h3>
+            <div class="result-info">
+              <p><strong>Prompt:</strong> <span id="resultPrompt"></span></p>
+              <p><strong>Duration:</strong> <span id="resultDuration"></span> seconds</p>
+              <p><strong>Generated at:</strong> <span id="resultTime"></span></p>
+            </div>
+            <div class="result-actions">
+              <button id="downloadBtn" class="btn btn-primary">
+                <span class="btn-icon">⬇️</span>
+                Download Video
+              </button>
+              <button onclick="location.reload()" class="btn btn-secondary">
+                Generate Another
+              </button>
+            </div>
+          </div>
+          <div id="errorResult" style="display: none;">
+            <h3>❌ Error Generating Video</h3>
+            <p id="errorMessage"></p>
+            <button onclick="location.reload()" class="btn btn-primary">Try Again</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Job History Section -->
+      <section class="history-section" id="historySection" style="display: none;">
+        <h2>📋 Generation History</h2>
+        <div id="jobsList" class="jobs-list"></div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>🎬 Image to Video Generator v1.0 | Transform images into videos with AI</p>
+    </footer>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
